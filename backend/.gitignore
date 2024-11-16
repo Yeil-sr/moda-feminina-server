@@ -1,4 +1,4 @@
 /node_modules
 key.json
-.env
-vercel.json
+/env
+/vercel.json
