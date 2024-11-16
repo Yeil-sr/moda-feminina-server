@@ -1,13 +1,12 @@
 const mongoose = require("mongoose");
 
-const dbUser = process.env.DB_USER;
-const dbPassword = process.env.DB_PASSWORD;
-
 const connect = () => {
-    mongoose.connect(
-        `mongodb+srv://${dbUser}:${dbPassword}@cluster0.hywij.mongodb.net/?retryWrites=true&w=majority&tlsAllowInvalidCertificates=true`
-    );
-    
+    mongoose.connect(process.env.MONGO_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        tlsInsecure: true, // Força conexões TLS
+    });
+        
     const connection = mongoose.connection;
 
     connection.on("error", () => {
