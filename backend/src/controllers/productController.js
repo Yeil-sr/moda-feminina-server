@@ -36,27 +36,20 @@ exports.removeProduct = async (req, res) => {
     }
 };
 
-exports.getnewCollections = async (req, res) => {
+exports.getAllProducts = async (req, res) => {
     try {
-        // Obter todos os produtos
-        const products = await Product.find({});
-
-        // Misturar os produtos de forma aleatória
-        const randomProducts = products.sort(() => Math.random() - 0.5);
-
-        // Selecionar os primeiros 4 produtos
-        const newCollection = randomProducts.slice(0, 4);
-
-        console.log("New Collection fetched successfully");
-        res.json({ success: true, products: newCollection });
+        const products = await Product.find();
+        res.json({ success: true, products });
     } catch (error) {
-        console.error("Error fetching new collection:", error);
-        res.status(500).json({
-            success: false,
-            message: "Error fetching new collection",
-            error,
-        });
+        res.status(500).json({ success: false, message: "Error fetching products", error });
     }
+};
+
+exports.getnewCollections = async (req,res)=>{
+    let products = await Product.find({});
+    let newcollection = products.slice(0);
+    console.log("NewCollection Fetched");
+    res.send(newcollection);
 };
 
 exports.popularlingerie = async (req, res) => {
@@ -74,9 +67,9 @@ exports.popularlingerie = async (req, res) => {
         ];
 
         // Misturar os produtos de forma aleatória
-        combinedProducts = combinedProducts.sort(() => Math.random() - 0.5);
+        combinedProducts = combinedProducts.sort(() => Math.random() - 2);
 
-        // Selecionar os primeiros 4 produtos
+        // Retornar os primeiros 4 produtos aleatórios
         const popularItems = combinedProducts.slice(0, 4);
 
         console.log("Popular products fetched successfully");
