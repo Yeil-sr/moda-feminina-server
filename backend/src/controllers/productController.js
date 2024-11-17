@@ -26,6 +26,7 @@ exports.addProduct = async (req, res) => {
     }
 };
 
+
 exports.removeProduct = async (req, res) => {
     try {
         await Product.findOneAndDelete({ id: req.body.id });
@@ -44,28 +45,30 @@ exports.getAllProducts = async (req, res) => {
     }
 };
 
-const fetchProductsByCategories = async (categories) => {
-    // Busca produtos com base nas categorias fornecidas
-    const products = await Product.find({ category: { $in: categories } });
-    // Embaralha a ordem dos produtos
-    return products.sort(() => Math.random() - 0.5);
+// Função auxiliar para buscar produtos por categorias e limitar a quantidade
+const fetchProductsByCategories = async (categories, limit) => {
+    try {
+        // Buscar produtos de múltiplas categorias
+        const products = await Product.find({ category: { $in: categories } });
+        // Misturar os produtos aleatoriamente
+        const shuffledProducts = products.sort(() => Math.random() - 0.5);
+        // Retornar os primeiros "limit" produtos
+        return shuffledProducts.slice(0, limit);
+    } catch (error) {
+        console.error("Error fetching products by categories:", error);
+        throw error;
+    }
 };
 
 exports.getnewCollections = async (req, res) => {
     try {
-        // Busca e mistura produtos das categorias
-        const newCollections = await fetchProductsByCategories([
-            "sutia",
-            "lingerie",
-            "calcinha",
-        ]);
+        // Categorias para novas coleções
+        const categories = ["lingerie", "sutiã", "calcinha"];
+        const limit = 4; // Número de produtos a serem exibidos
+        const newCollections = await fetchProductsByCategories(categories, limit);
 
-        // Retorna os primeiros 4 produtos
-        res.json({
-            success: true,
-            products: newCollections.slice(0, 4),
-        });
-        console.log("New collection fetched successfully");
+        console.log("New collections fetched successfully");
+        res.json({ success: true, products: newCollections });
     } catch (error) {
         console.error("Error fetching new collections:", error);
         res.status(500).json({
@@ -78,19 +81,13 @@ exports.getnewCollections = async (req, res) => {
 
 exports.popularlingerie = async (req, res) => {
     try {
-        // Busca e mistura produtos das categorias
-        const popularProducts = await fetchProductsByCategories([
-            "sutia",
-            "lingerie",
-            "calcinha",
-        ]);
+        // Categorias para produtos populares
+        const categories = ["lingerie", "sutiã", "calcinha"];
+        const limit = 4; // Número de produtos a serem exibidos
+        const popularProducts = await fetchProductsByCategories(categories, limit);
 
-        // Retorna os primeiros 4 produtos
-        res.json({
-            success: true,
-            products: popularProducts.slice(0, 4),
-        });
         console.log("Popular products fetched successfully");
+        res.json({ success: true, products: popularProducts });
     } catch (error) {
         console.error("Error fetching popular products:", error);
         res.status(500).json({
