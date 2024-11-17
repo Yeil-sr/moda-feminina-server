@@ -26,6 +26,7 @@ exports.addProduct = async (req, res) => {
     }
 };
 
+
 exports.removeProduct = async (req, res) => {
     try {
         await Product.findOneAndDelete({ id: req.body.id });
@@ -44,35 +45,16 @@ exports.getAllProducts = async (req, res) => {
     }
 };
 
-exports.getnewCollections = async (req, res) => {
-    try {
-        // Buscar os produtos em ordem decrescente de ID e limitar a 4 resultados
-        const newCollection = await Product.find().sort({ id: -1 }).limit(4);
-        console.log("New Collection Fetched");
-        res.json({ success: true, products: newCollection });
-    } catch (error) {
-        console.error("Error fetching new collections:", error);
-        res.status(500).json({
-            success: false,
-            message: "Error fetching new collections",
-            error,
-        });
-    }
+exports.getnewCollections = async (req,res)=>{
+    let products = await Product.find({});
+    let newcollection = products.slice(0,4);
+    console.log("NewCollection Fetched");
+    res.send(newcollection);
 };
 
-exports.popularlingerie = async (req, res) => {
-    try {
-        const popularInLingerie = await Product.find({ category: "lingerie" })
-            .sort({ id: -1 })
-            .limit(4);
-        console.log("Popular in lingerie fetched");
-        res.json({ success: true, products: popularInLingerie });
-    } catch (error) {
-        console.error("Error fetching popular lingerie products:", error);
-        res.status(500).json({
-            success: false,
-            message: "Error fetching popular lingerie products",
-            error,
-        });
-    }
-};
+exports.popularlingerie = async(req,res)=>{
+    let products = await Product.find({category:"lingerie"});
+    let popular_in_lingerie = products.slice(0,4);
+    console.log("Popular in lingerie fetched");
+    res.send(popular_in_lingerie);
+}
