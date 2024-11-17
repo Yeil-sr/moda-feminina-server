@@ -47,14 +47,39 @@ exports.getAllProducts = async (req, res) => {
 
 exports.getnewCollections = async (req,res)=>{
     let products = await Product.find({});
-    let newcollection = products.slice(1).slice(-8);
+    let newcollection = products.slice(0);
     console.log("NewCollection Fetched");
     res.send(newcollection);
 };
 
-exports.popularlingerie = async(req,res)=>{
-    let products = await Product.find({category:"lingerie"});
-    let popular_in_lingerie = products.slice(0,4);
-    console.log("Popular in lingerie fetched");
-    res.send(popular_in_lingerie);
-}
+exports.popularlingerie = async (req, res) => {
+    try {
+        // Filtrar produtos pelas categorias especificadas
+        const lingerieProducts = await Product.find({ category: "lingerie" });
+        const sutiaProducts = await Product.find({ category: "sutiã" });
+        const calcinhaProducts = await Product.find({ category: "calcinha" });
+
+        // Combinar todos os produtos em um único array
+        let combinedProducts = [
+            ...lingerieProducts,
+            ...sutiaProducts,
+            ...calcinhaProducts,
+        ];
+
+        // Misturar os produtos de forma aleatória
+        combinedProducts = combinedProducts.sort(() => Math.random() - 0.5);
+
+        // Retornar os primeiros 4 produtos aleatórios
+        const popularItems = combinedProducts.slice(0, 4);
+
+        console.log("Popular products fetched successfully");
+        res.json({ success: true, products: popularItems });
+    } catch (error) {
+        console.error("Error fetching popular products:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching popular products",
+            error,
+        });
+    }
+};
