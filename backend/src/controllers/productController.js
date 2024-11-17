@@ -47,7 +47,7 @@ exports.getAllProducts = async (req, res) => {
 
 exports.getnewCollections = async (req,res)=>{
     let products = await Product.find({});
-    let newcollection = products.slice(0,4);
+    let newcollection = products.slice(4,0);
     console.log("NewCollection Fetched");
     res.send(newcollection);
 };
