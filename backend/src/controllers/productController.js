@@ -26,7 +26,6 @@ exports.addProduct = async (req, res) => {
     }
 };
 
-
 exports.removeProduct = async (req, res) => {
     try {
         await Product.findOneAndDelete({ id: req.body.id });
@@ -45,35 +44,53 @@ exports.getAllProducts = async (req, res) => {
     }
 };
 
-exports.getnewCollections = async (req,res)=>{
-    let products = await Product.find({});
-    let newcollection = products.slice(0);
-    console.log("NewCollection Fetched");
-    res.send(newcollection);
+const fetchProductsByCategories = async (categories) => {
+    // Busca produtos com base nas categorias fornecidas
+    const products = await Product.find({ category: { $in: categories } });
+    // Embaralha a ordem dos produtos
+    return products.sort(() => Math.random() - 0.5);
+};
+
+exports.getnewCollections = async (req, res) => {
+    try {
+        // Busca e mistura produtos das categorias
+        const newCollections = await fetchProductsByCategories([
+            "sutia",
+            "lingerie",
+            "calcinha",
+        ]);
+
+        // Retorna os primeiros 4 produtos
+        res.json({
+            success: true,
+            products: newCollections.slice(0, 4),
+        });
+        console.log("New collection fetched successfully");
+    } catch (error) {
+        console.error("Error fetching new collections:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching new collections",
+            error,
+        });
+    }
 };
 
 exports.popularlingerie = async (req, res) => {
     try {
-        // Filtrar produtos pelas categorias especificadas
-        const lingerieProducts = await Product.find({ category: "lingerie" });
-        const sutiaProducts = await Product.find({ category: "sutiã" });
-        const calcinhaProducts = await Product.find({ category: "calcinha" });
+        // Busca e mistura produtos das categorias
+        const popularProducts = await fetchProductsByCategories([
+            "sutia",
+            "lingerie",
+            "calcinha",
+        ]);
 
-        // Combinar todos os produtos em um único array
-        let combinedProducts = [
-            ...lingerieProducts,
-            ...sutiaProducts,
-            ...calcinhaProducts,
-        ];
-
-        // Misturar os produtos de forma aleatória
-        combinedProducts = combinedProducts.sort(() => Math.random() - 2);
-
-        // Retornar os primeiros 4 produtos aleatórios
-        const popularItems = combinedProducts.slice(0, 4);
-
+        // Retorna os primeiros 4 produtos
+        res.json({
+            success: true,
+            products: popularProducts.slice(0, 4),
+        });
         console.log("Popular products fetched successfully");
-        res.json({ success: true, products: popularItems });
     } catch (error) {
         console.error("Error fetching popular products:", error);
         res.status(500).json({
